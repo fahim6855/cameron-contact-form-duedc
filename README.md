@@ -1,35 +1,135 @@
-# Cypulse Contact Form (Next.js + Tailwind)
+# Cypulse Contact Form
 
-Same page and same Supabase backend as the React version, rebuilt with Next.js (App Router) and Tailwind CSS.
+A "Meet with Cameron" contact page built for the DUEDC Full Stack Task (Task 2: Web Development). The page matches the provided design, works on mobile, and saves every submission to a database through an API.
 
-## Run it
+**Live demo:** 
+**View Stored Messages:** 
 
-1. **Backend:** reuse the `messages` table and the two Edge Functions (`submit-message`, `list-messages`) from the React project. Nothing new to deploy.
-2. Create your env file and set your project URL:
-   ```bash
-   cp .env.example .env.local
-   ```
-3. Install and start:
-   ```bash
-   npm install
-   npm run dev
-   ```
-   Form: http://localhost:3000 | Admin list: http://localhost:3000/admin
+## Pages
 
-## Deploy (Vercel)
+| Page | URL | What it shows |
+|---|---|---|
+| Contact form | `/` | The designed form: Full Name, Company Name, Email, Phone, privacy checkbox and the Send Message button |
+| Saved messages | `/messages` | A table of every message saved in the database, newest first |
 
-Import the repo in Vercel, add the environment variable `SUPABASE_URL`, and deploy.
+To see the whole flow: open `/`, send a message, then open `/messages` and the new entry appears at the top.
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16 (App Router), React 19, Tailwind CSS 4 |
+| Data fetching | Server Components and Server Actions (no `useEffect`) |
+| Backend API | Supabase Edge Functions (TypeScript on Deno) |
+| Database | Supabase Postgres |
+| Hosting | Vercel (frontend), Supabase (API and database) |
 
 ## How it works
 
-| File | What it does |
-|---|---|
-| `app/page.js` | Server Component. Static markup (title, photo, chat button). |
-| `app/ContactForm.js` | The only Client Component. `useActionState` gives the result and a pending flag for the loading button. |
-| `app/actions.js` | Server Action. Receives the form on the server and forwards it to the Edge Function. |
-| `app/admin/page.js` | Server Component that fetches the saved messages on the server. No `useEffect`. |
-| `app/globals.css` | Tailwind theme (colors, breakpoints) and the gradient background. |
+```
+Form  ->  Server Action (Next.js)  ->  Edge Function  ->  Postgres
+/messages (Server Component)       ->  Edge Function  ->  Postgres
+```
 
-- Validation lives in one place, the Edge Function. Its field errors are shown under each input.
-- `SUPABASE_URL` has no `NEXT_PUBLIC_` prefix, so it stays on the server and never reaches the browser.
-- `/admin` has no login. Fine for a demo with test data only.
+- Clicking **Send Message** submits the form to a Next.js Server Action, which sends the data to the `submit-message` API.
+- The button shows a loading state while sending, then a success or error message. The form clears after a successful send.
+- The API checks that all fields are filled, the email is valid, the phone number is valid, and the checkbox is ticked. Errors come back as clear messages and appear under the matching field.
+- The `/messages` page loads its data on the server from the `list-messages` API.
+
+## API
+
+Base URL: `https://YOUR-PROJECT-REF.supabase.co/functions/v1`
+
+### `POST /submit-message`
+
+```bash
+curl -X POST "$BASE/submit-message" \
+  -H "Content-Type: application/json" \
+  -d '{"fullName":"Ada Lovelace","companyName":"Analytical Co","email":"ada@example.com","phone":"+44 20 7946 0958","consent":true}'
+```
+
+| Result | Status | Response |
+|---|---|---|
+| Saved | 201 | `{"success":true,"message":"Message sent. Cameron will get back to you soon.","data":{...}}` |
+| Invalid input | 400 | `{"success":false,"message":"Please fix the errors and try again.","errors":{"email":"Enter a valid email address."}}` |
+| Wrong method | 405 | `{"success":false,"message":"Method not allowed. Use POST."}` |
+| Server error | 500 | `{"success":false,"message":"Could not save your message. Please try again later."}` |
+
+### `GET /list-messages`
+
+```bash
+curl "$BASE/list-messages"
+```
+
+Returns `{"success":true,"count":N,"data":[...]}`, newest first.
+
+## Run it locally
+
+**Requirements:** Node.js 20 or newer, a free [Supabase](https://supabase.com) account.
+
+**1. Install the project**
+
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+cd YOUR-REPO
+npm install
+```
+
+**2. Create the database table**
+
+In your Supabase project, open **SQL Editor > New query**, paste the contents of `supabase/migrations/001_create_messages.sql`, and click **Run**.
+
+**3. Deploy the two API functions**
+
+```bash
+npx supabase login
+npx supabase init        # only if supabase/config.toml is missing
+npx supabase link --project-ref YOUR-PROJECT-REF
+npx supabase functions deploy submit-message --no-verify-jwt
+npx supabase functions deploy list-messages --no-verify-jwt
+```
+
+Your project ref is the part of your project URL before `.supabase.co`. A Docker warning during deploy can be ignored. If the deploy fails because of Docker, add `--use-api` to each deploy command.
+
+**4. Set the environment variable**
+
+Copy `.env.example` to `.env.local` and set your project URL:
+
+```
+SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+```
+
+**5. Start the app**
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 for the form and http://localhost:3000/messages for the saved messages.
+
+## Project structure
+
+```
+app/
+  page.js              Contact page (Server Component)
+  ContactForm.js       The form (Client Component)
+  actions.js           Server Action that sends the form to the API
+  messages/page.js     Saved messages page (Server Component)
+  layout.js            Font and page layout
+  globals.css          Tailwind theme and the gradient background
+public/cameron.svg     Placeholder photo for Cameron
+supabase/
+  migrations/          SQL for the messages table
+  functions/
+    submit-message/    API: validate and save a message
+    list-messages/     API: list all messages
+    _shared/cors.ts    Shared CORS and JSON helper
+```
+
+## Notes
+
+- **Validation** lives in the API, so it cannot be skipped by calling the API directly. The database also has matching `CHECK` constraints.
+- **Security:** Row Level Security is on with no public policies, so the browser cannot read or write the table directly. Only the Edge Functions can, using a service key that Supabase keeps on its servers. It is not in this repo.
+- **Environment variable:** `SUPABASE_URL` has no `NEXT_PUBLIC_` prefix, so it is only used on the server.
+- **Open endpoints:** the functions are deployed with `--no-verify-jwt` and `/messages` has no login, because the task only asks for a simple save and list. A production version would add authentication.
+- **Free tier:** Supabase pauses free projects after a period of inactivity. If the live demo does not respond, the project may need to be restored from the Supabase dashboard.
