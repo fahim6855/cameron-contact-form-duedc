@@ -128,6 +128,12 @@ supabase/
 
 ## Notes
 
+## Publish and security review
+
+From the README alone, no secret credentials are revealed: the Supabase URL and project ref are placeholders, and no service-role key or other private key is shown. The live site URL and Supabase function endpoints are public identifiers, not secrets. This is only a review of this README; check the full repository and deployment configuration before publishing.
+
+The project is publishable as a demo, but the described setup is not production-ready: `/messages` and `list-messages` are public and can expose submitted contact details, while the submit endpoint is open to abuse. Before production, require authorization to read messages and add appropriate abuse protection, such as rate limiting. Also review applicable privacy and data-retention requirements.
+
 - **Validation** lives in the API, so it cannot be skipped by calling the API directly. The database also has matching `CHECK` constraints.
 - **Security:** Row Level Security is on with no public policies, so the browser cannot read or write the table directly. Only the Edge Functions can, using a service key that Supabase keeps on its servers. It is not in this repo.
 - **Environment variable:** `SUPABASE_URL` has no `NEXT_PUBLIC_` prefix, so it is only used on the server.
