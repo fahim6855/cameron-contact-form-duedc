@@ -2,8 +2,8 @@
 
 A "Meet with Cameron" contact page built for the DUEDC Full Stack Task (Task 2: Web Development). The page matches the provided design, works on mobile, and saves every submission to a database through an API.
 
-**Live demo:** 
-**View Stored Messages:** 
+**Live demo:** https://cameron-contact-form-duedc.vercel.app/ <br>
+**View Stored Messages:** https://cameron-contact-form-duedc.vercel.app/messages
 
 ## Pages
 
@@ -70,7 +70,7 @@ Returns `{"success":true,"count":N,"data":[...]}`, newest first.
 **1. Install the project**
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git clone https://github.com/fahim6855/cameron-contact-form-duedc
 cd YOUR-REPO
 npm install
 ```
