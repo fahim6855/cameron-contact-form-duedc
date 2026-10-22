@@ -3,7 +3,8 @@
 A "Meet with Cameron" contact page built for the DUEDC Full Stack Task (Task 2: Web Development). The page matches the provided design, works on mobile, and saves every submission to a database through an API.
 
 **Live demo:** https://cameron-contact-form-duedc.vercel.app/ <br>
-**View Stored Messages:** https://cameron-contact-form-duedc.vercel.app/messages
+**View Stored Messages:** https://cameron-contact-form-duedc.vercel.app/messages <br>
+**Api Endpoint:** https://vcpiitvrjtbtzhwimovi.supabase.co/functions/v1/list-messages
 
 ## Pages
 
@@ -139,3 +140,8 @@ The project is publishable as a demo, but the described setup is not production-
 - **Environment variable:** `SUPABASE_URL` has no `NEXT_PUBLIC_` prefix, so it is only used on the server.
 - **Open endpoints:** the functions are deployed with `--no-verify-jwt` and `/messages` has no login, because the task only asks for a simple save and list. A production version would add authentication.
 - **Free tier:** Supabase pauses free projects after a period of inactivity. If the live demo does not respond, the project may need to be restored from the Supabase dashboard.
+
+<b>Submitted to DUEDC By: </b> </br>
+Name: Fazlul Haque (Fahim) </br>
+Email: fahimafnan39@gmail.com </br>
+DU Reg: 2025-517-189
