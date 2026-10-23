@@ -16,7 +16,7 @@ export default async function AdminPage() {
         <table className="w-full text-[0.8125rem]">
           <thead>
             <tr className="text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-muted">
-              {["Name", "Company", "Email", "Phone", "Received (UTC)"].map((h) => (
+              {["Name", "Company", "Email", "Phone", "Received (UTC+6)"].map((h) => (
                 <th key={h} className="whitespace-nowrap px-3.5 pb-3 text-left">{h}</th>
               ))}
             </tr>
@@ -31,7 +31,7 @@ export default async function AdminPage() {
                 </td>
                 <td className="p-3.5">{m.phone}</td>
                 <td className="whitespace-nowrap p-3.5 text-muted">
-                  {new Date(m.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" })}
+                  {new Date(m.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Dhaka" })}
                 </td>
               </tr>
             ))}
