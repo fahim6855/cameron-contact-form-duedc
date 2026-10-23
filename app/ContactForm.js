@@ -50,7 +50,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-11 w-full min-w-32 items-center justify-center gap-2 rounded-lg bg-brand px-5 text-xs font-medium text-white enabled:hover:bg-[#7c3aed] disabled:cursor-progress disabled:opacity-80 sm:h-[38px] sm:w-auto"
+          className="cursor-pointer inline-flex h-11 w-full min-w-32 items-center justify-center gap-2 rounded-lg bg-brand px-5 text-xs font-medium text-white enabled:hover:bg-[#7c3aed] disabled:cursor-progress disabled:opacity-80 sm:h-[38px] sm:w-auto"
         >
           {isPending && <span className="size-3 animate-spin rounded-full border-2 border-white/35 border-t-white" />}
           {isPending ? "Sending…" : "Send Message"}
